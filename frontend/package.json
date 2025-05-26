@@ -12,12 +12,13 @@
     "@tailwindcss/vite": "^4.1.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "tailwindcss": "^4.1.7"
+    "tailwindcss": "^4.1.7",
+    "video-react": "^0.16.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
-    "@vitejs/plugin-react": "^2.2.0",
+    "@vitejs/plugin-react": "^4.5.0",
     "typescript": "^4.6.4",
     "vite": "^6.3.5"
   }
