@@ -111,12 +111,16 @@ function App() {
               </p>
             </div>
           ) : (
-            <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
-              <button onClick={closeVideo}>Close Video</button>
-              <Player src={selectedVideo} autoPlay={false}>
-                {/* The Player component handles the source internally if src is provided */}
-              </Player>
-            </div>
+            <>
+              <button className="text-black" onClick={closeVideo}>
+                Close Video
+              </button>
+              <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
+                <Player src={selectedVideo} autoPlay={false}>
+                  {/* The Player component handles the source internally if src is provided */}
+                </Player>
+              </div>
+            </>
           )}
           {/* Hidden file input, more specific accept types */}
           <input
