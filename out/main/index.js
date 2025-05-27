@@ -2,6 +2,7 @@
 const electron = require("electron");
 const path = require("path");
 const utils = require("@electron-toolkit/utils");
+const child_process = require("child_process");
 const icon = path.join(__dirname, "../../resources/icon.png");
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
@@ -35,6 +36,46 @@ electron.app.whenReady().then(() => {
     window.webContents.openDevTools();
   });
   electron.ipcMain.on("ping", () => console.log("pong"));
+  electron.ipcMain.handle("get-file-metadata", async (_event, filePath) => {
+    console.log("Getting metadata for:", filePath);
+    try {
+      const ffprobe = child_process.spawn("ffmpeg", [
+        "-i",
+        filePath,
+        "-f",
+        "ffmetadata",
+        "-"
+      ]);
+      return new Promise((resolve, reject) => {
+        let stdout = "";
+        let stderr = "";
+        ffprobe.stdout.on("data", (data) => {
+          stdout += data.toString();
+        });
+        ffprobe.stderr.on("data", (data) => {
+          stderr += data.toString();
+        });
+        ffprobe.on("close", (code) => {
+          if (code === 0) {
+            try {
+              const metadata = JSON.parse(stdout);
+              resolve(metadata);
+            } catch (err) {
+              reject(`Error parsing ffprobe output: ${err}`);
+            }
+          } else {
+            reject(`ffprobe exited with code ${code}: ${stderr}`);
+          }
+        });
+        ffprobe.on("error", (err) => {
+          reject(`Failed to spawn ffprobe: ${err.message}`);
+        });
+      });
+    } catch (error) {
+      console.error("Error running ffprobe:", error);
+      throw error;
+    }
+  });
   createWindow();
   electron.app.on("activate", function() {
     if (electron.BrowserWindow.getAllWindows().length === 0) createWindow();

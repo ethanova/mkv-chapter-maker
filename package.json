@@ -24,7 +24,9 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@tailwindcss/vite": "^4.1.7",
+    "@types/fluent-ffmpeg": "^2.1.27",
     "@types/video-react": "^0.15.8",
+    "fluent-ffmpeg": "^2.1.3",
     "tailwindcss": "^4.1.7",
     "video-react": "^0.16.0"
   },

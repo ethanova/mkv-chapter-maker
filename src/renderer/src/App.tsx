@@ -16,13 +16,6 @@ function App() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // useEffect(() => {
-  //   // Call this when your app is ready and has loaded
-  //   if (window.Main) {
-  //     window.Main.removeLoading();
-  //   }
-  // }, []); // Empty dependency array ensures this runs only once when the component mounts
-
   const handleVideoSelectContainerClick = () => {
     // Trigger the hidden file input
     fileInputRef.current?.click();
@@ -37,6 +30,18 @@ function App() {
       setSelectedVideo(videoUrl);
       // Potentially clear chapters or load new ones based on the video
       setChapters([]); // Reset chapters on new video
+      
+      // Get the file metadata using ffmpeg
+      const filePath = file.path; // Electron's file input includes the full path
+      window.api.getFileMetadata(filePath)
+        .then((metadata) => {
+          console.log("File metadata:", metadata);
+          // Here you can process the metadata to extract chapters if available
+          // or use other information from the metadata as needed
+        })
+        .catch((error) => {
+          console.error("Error getting file metadata:", error);
+        });
     }
   };
 
@@ -46,11 +51,6 @@ function App() {
 
   return (
     <div className="flex flex-col">
-      {/* {window.Main && (
-        <div className="flex-none">
-          <AppBar />
-        </div>
-      )} */}
       <div className="flex h-screen font-sans bg-gray-50">
         {/* Left Column: Chapters */}
         <div className="w-1/5 bg-slate-100 p-4 flex flex-col border-r border-slate-300 shadow-sm">

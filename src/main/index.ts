@@ -2,6 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
+import { spawn } from "child_process";
 
 function createWindow(): void {
   // Create the browser window.
@@ -52,6 +53,53 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on("ping", () => console.log("pong"));
+
+  // Handle ffmpeg metadata extraction
+  ipcMain.handle("get-file-metadata", async (_event, filePath: string) => {
+    console.log("Getting metadata for:", filePath);
+    try {
+      const ffprobe = spawn("ffmpeg", [
+        "-i",
+        filePath,
+        "-f",
+        "ffmetadata",
+        "-",
+      ]);
+
+      return new Promise((resolve, reject) => {
+        let stdout = "";
+        let stderr = "";
+
+        ffprobe.stdout.on("data", (data) => {
+          stdout += data.toString();
+        });
+
+        ffprobe.stderr.on("data", (data) => {
+          stderr += data.toString();
+        });
+
+        ffprobe.on("close", (code) => {
+          if (code === 0) {
+            try {
+              const metadata = JSON.parse(stdout);
+              resolve(metadata);
+            } catch (err) {
+              reject(`Error parsing ffprobe output: ${err}`);
+            }
+          } else {
+            reject(`ffprobe exited with code ${code}: ${stderr}`);
+          }
+        });
+
+        ffprobe.on("error", (err) => {
+          reject(`Failed to spawn ffprobe: ${err.message}`);
+        });
+      });
+    } catch (error) {
+      console.error("Error running ffprobe:", error);
+      throw error;
+    }
+  });
 
   createWindow();
 
