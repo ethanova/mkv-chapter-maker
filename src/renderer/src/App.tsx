@@ -1,26 +1,21 @@
 import { useState } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { Player } from "video-react"; // Player component
+import { Chapter, parseChapters } from "./utils";
 // import AppBar from "./AppBar";
-
-// Placeholder for chapter type, can be refined later
-interface Chapter {
-  id: string;
-  name: string;
-  timestamp: number; // Example property
-}
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   // Example chapter data, replace with actual logic later
   const [chapters, setChapters] = useState<Chapter[]>([]);
+  const [loadingChapters, setLoadingChapters] = useState(false);
 
   const handleVideoSelectContainerClick = async () => {
     try {
       // Open Electron's file dialog
       const filePath = await window.api.openFileDialog();
-      
+
       if (filePath) {
         handleFileSelection(filePath);
       }
@@ -32,24 +27,30 @@ function App() {
   const handleFileSelection = (filePath: string) => {
     console.log("Selected file path:", filePath);
     setSelectedFilePath(filePath);
-    
+
     // For video display, we need to create a URL that points to the file
     // Using a protocol handler that works with Electron
     const videoUrl = `file://${filePath}`;
     console.log("Video URL for player:", videoUrl);
     setSelectedVideo(videoUrl);
-    
+
     // Reset chapters on new video
     setChapters([]);
-    
+
     // Get the file metadata using ffmpeg
-    window.api.getFileMetadata(filePath)
+    setLoadingChapters(true);
+    window.api
+      .getFileMetadata(filePath)
       .then((metadata) => {
         console.log("File metadata:", metadata);
         // Here you can process the metadata to extract chapters if available
         // or use other information from the metadata as needed
+        const chapters = parseChapters(metadata);
+        setChapters(chapters);
+        setLoadingChapters(false);
       })
       .catch((error) => {
+        setLoadingChapters(false);
         console.error("Error getting file metadata:", error);
       });
   };
@@ -75,10 +76,10 @@ function App() {
               <ul className="space-y-2">
                 {chapters.map((chapter) => (
                   <li
-                    key={chapter.id}
+                    key={chapter.title}
                     className="p-2 bg-white rounded-md shadow-xs cursor-pointer hover:bg-slate-50 transition-colors"
                   >
-                    {chapter.name}
+                    {chapter.title}
                   </li>
                 ))}
               </ul>
