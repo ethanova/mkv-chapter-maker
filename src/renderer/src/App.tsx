@@ -19,6 +19,7 @@ function App() {
   const playerRef = useRef<PlayerReference | null>(null);
   // State to track current playback time in milliseconds
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
+  const [newChapterTitle, setNewChapterTitle] = useState<string>("");
 
   const handleVideoSelectContainerClick = async () => {
     try {
@@ -89,8 +90,9 @@ function App() {
   };
 
   const addChapter = () => {
-    const newChapters = insertChapter(chapters, currentTimeMs);
+    const newChapters = insertChapter(chapters, currentTimeMs, newChapterTitle);
     setChapters(newChapters);
+    setNewChapterTitle("");
   };
 
   const removeChapter = (index: number) => {
@@ -131,7 +133,15 @@ function App() {
       <div className="flex h-screen font-sans bg-gray-50">
         {/* Left Column: Chapters */}
         <div className="w-1/5 bg-slate-100 p-4 flex flex-col border-r border-slate-300 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4 text-slate-700">
+          <h2 className="text-xl font-semibold mb-4 text-slate-700 flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2 text-blue-500"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+            </svg>
             Chapters
           </h2>
           <div className="overflow-y-auto flex-grow">
@@ -263,9 +273,39 @@ function App() {
               </div>
               <div className="mt-4 flex justify-center space-x-2">
                 <span className="text-lg font-mono">
-                  {formatMillisecondsToTime(currentTimeMs)}
+                  Current Time: {formatMillisecondsToTime(currentTimeMs)}
                 </span>
-                <button onClick={addChapter}>Add Chapter Here</button>
+              </div>
+              <div className="mt-4 flex flex-col items-center space-y-3">
+                <div className="w-full max-w-lg">
+                  <label
+                    htmlFor="chapterTitle"
+                    className="block text-sm font-medium text-slate-700 mb-1"
+                  >
+                    Chapter Title
+                  </label>
+                  <div className="flex space-x-2">
+                    <input
+                      id="chapterTitle"
+                      type="text"
+                      placeholder="Enter a descriptive title"
+                      value={newChapterTitle}
+                      onChange={(e) => setNewChapterTitle(e.target.value)}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                      disabled={!newChapterTitle}
+                      onClick={addChapter}
+                      className={`px-4 py-2 rounded-md text-white font-medium shadow-sm ${
+                        !newChapterTitle
+                          ? "bg-slate-400 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700 transition-colors"
+                      }`}
+                    >
+                      Add Chapter
+                    </button>
+                  </div>
+                </div>
               </div>
             </>
           )}
