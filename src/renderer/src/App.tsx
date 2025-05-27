@@ -1,8 +1,8 @@
 import { useState, useRef } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
-import { Chapter, formatMillisecondsToTime, parseChapters } from "./utils";
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { Chapter, parseChapters } from "./utils";
+import ChapterCard from "./components/ChapterCard";
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -104,26 +104,16 @@ function App() {
                 Select a video to see chapters.
               </p>
             ) : (
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {chapters.map((chapter) => (
-                  <li
-                    key={chapter.title}
-                    className="p-2 bg-white rounded-md shadow-xs cursor-pointer hover:bg-slate-50 transition-colors"
-                    onClick={() => {
-                      playerRef.current?.seek(chapter.start / 1000);
-                    }}
-                  >
-                    <div>
-                      {chapter.title} /{formatMillisecondsToTime(chapter.start)}{" "}
-                      /{formatMillisecondsToTime(chapter.end)}
-                    </div>
-                    <div>
-                      <button
-                        onClick={() => removeChapter(chapters.indexOf(chapter))}
-                      >
-                        <TrashIcon className="size-6" />
-                      </button>
-                    </div>
+                  <li key={chapter.title}>
+                    <ChapterCard
+                      chapter={chapter}
+                      onClick={() => {
+                        playerRef.current?.seek(chapter.start / 1000);
+                      }}
+                      onDelete={() => removeChapter(chapters.indexOf(chapter))}
+                    />
                   </li>
                 ))}
               </ul>
