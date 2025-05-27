@@ -1,19 +1,37 @@
-# README
+# Vite + React + Typescript + Electron - Starter
 
-## About
+https://github.com/AleBL/vite-reactts-electron-starter/assets/26389226/2697ab5c-b6c5-4c28-ab40-1a237e12cf8d
 
-This is the official Wails React-TS template.
+> It is a simple starter template without unnecessary packages.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+This very simple Starter template, utilizes [Vite](https://github.com/vitejs/vite), [Tailwind](https://tailwindcss.com/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
 
-## Live Development
+By default, the React framework is used for the interface, but you can easily use any other framework such as Vue, Preact, Angular, Svelte or anything else.
 
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
+> Vite is framework agnostic
 
-## Building
+## Installation
 
-To build a redistributable, production mode package, use `wails build`.
+Clone this repo and install all dependencies  
+`yarn` or `npm install`
+
+## Development
+
+`yarn dev` or `npm run dev`
+
+## Build
+
+`yarn build` or `npm run build`
+
+## Publish
+
+`yarn dist` or `npm run dist`
+
+## More advanced templates  
+
+If you are looking for more advanced templates than this, please go to one of the following links (these are some other links out of the **[awesome-vite](https://github.com/vitejs/awesome-vite)** repo) or you can help me make this template better 🙂  
+
+Links: 
+- [vite-react-electron](https://github.com/caoxiemeihao/vite-react-electron)
+- [electron-vite-react](https://github.com/twstyled/electron-vite-react)
+- [vite-electron-esbuild-starter](https://github.com/jctaoo/vite-electron-esbuild-starter)
