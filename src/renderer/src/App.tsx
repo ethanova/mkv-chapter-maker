@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { Player } from "video-react"; // Player component
 // import AppBar from "./AppBar";
@@ -12,37 +12,46 @@ interface Chapter {
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   // Example chapter data, replace with actual logic later
   const [chapters, setChapters] = useState<Chapter[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleVideoSelectContainerClick = () => {
-    // Trigger the hidden file input
-    fileInputRef.current?.click();
+  const handleVideoSelectContainerClick = async () => {
+    try {
+      // Open Electron's file dialog
+      const filePath = await window.api.openFileDialog();
+      
+      if (filePath) {
+        handleFileSelection(filePath);
+      }
+    } catch (error) {
+      console.error("Error opening file dialog:", error);
+    }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Create a URL for the selected file to be used by the video player
-      const videoUrl = URL.createObjectURL(file);
-      console.log("selected video", videoUrl);
-      setSelectedVideo(videoUrl);
-      // Potentially clear chapters or load new ones based on the video
-      setChapters([]); // Reset chapters on new video
-      
-      // Get the file metadata using ffmpeg
-      const filePath = file.path; // Electron's file input includes the full path
-      window.api.getFileMetadata(filePath)
-        .then((metadata) => {
-          console.log("File metadata:", metadata);
-          // Here you can process the metadata to extract chapters if available
-          // or use other information from the metadata as needed
-        })
-        .catch((error) => {
-          console.error("Error getting file metadata:", error);
-        });
-    }
+  const handleFileSelection = (filePath: string) => {
+    console.log("Selected file path:", filePath);
+    setSelectedFilePath(filePath);
+    
+    // For video display, we need to create a URL that points to the file
+    // Using a protocol handler that works with Electron
+    const videoUrl = `file://${filePath}`;
+    console.log("Video URL for player:", videoUrl);
+    setSelectedVideo(videoUrl);
+    
+    // Reset chapters on new video
+    setChapters([]);
+    
+    // Get the file metadata using ffmpeg
+    window.api.getFileMetadata(filePath)
+      .then((metadata) => {
+        console.log("File metadata:", metadata);
+        // Here you can process the metadata to extract chapters if available
+        // or use other information from the metadata as needed
+      })
+      .catch((error) => {
+        console.error("Error getting file metadata:", error);
+      });
   };
 
   const closeVideo = () => {
@@ -122,15 +131,7 @@ function App() {
               </div>
             </>
           )}
-          {/* Hidden file input, more specific accept types */}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            accept="video/mp4,video/webm,video/ogg,video/mkv,.mkv"
-            className="hidden"
-            aria-hidden="true"
-          />
+          {/* No hidden file input needed anymore, using Electron's dialog */}
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
@@ -15,6 +15,7 @@ function createWindow(): void {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
+      webSecurity: false,
     },
   });
 
@@ -54,6 +55,20 @@ app.whenReady().then(() => {
   // IPC test
   ipcMain.on("ping", () => console.log("pong"));
 
+  // Handle opening file dialog
+  ipcMain.handle("open-file-dialog", async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      properties: ["openFile"],
+      filters: [{ name: "Videos", extensions: ["mp4", "webm", "ogg", "mkv"] }],
+    });
+
+    if (canceled || filePaths.length === 0) {
+      return null;
+    }
+
+    return filePaths[0];
+  });
+
   // Handle ffmpeg metadata extraction
   ipcMain.handle("get-file-metadata", async (_event, filePath: string) => {
     console.log("Getting metadata for:", filePath);
@@ -81,7 +96,7 @@ app.whenReady().then(() => {
         ffprobe.on("close", (code) => {
           if (code === 0) {
             try {
-              const metadata = JSON.parse(stdout);
+              const metadata = stdout;
               resolve(metadata);
             } catch (err) {
               reject(`Error parsing ffprobe output: ${err}`);
