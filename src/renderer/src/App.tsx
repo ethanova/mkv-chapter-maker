@@ -1,7 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
-import { Chapter, parseChapters, formatMillisecondsToTime } from "./utils";
+import {
+  Chapter,
+  parseChapters,
+  formatMillisecondsToTime,
+  insertChapter,
+} from "./utils";
 import ChapterCard from "./components/ChapterCard";
 
 function App() {
@@ -81,6 +86,11 @@ function App() {
       // Set the new current time
       player.seek(newTime);
     }
+  };
+
+  const addChapter = () => {
+    const newChapters = insertChapter(chapters, currentTimeMs);
+    setChapters(newChapters);
   };
 
   const removeChapter = (index: number) => {
@@ -255,10 +265,10 @@ function App() {
                 <span className="text-lg font-mono">
                   {formatMillisecondsToTime(currentTimeMs)}
                 </span>
+                <button onClick={addChapter}>Add Chapter Here</button>
               </div>
             </>
           )}
-          {/* No hidden file input needed anymore, using Electron's dialog */}
         </div>
       </div>
     </div>

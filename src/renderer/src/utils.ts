@@ -122,3 +122,73 @@ export const formatMillisecondsToTime = (milliseconds: number): string => {
 
   return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 };
+
+/**
+ * Inserts a new chapter at the specified start time, adjusting existing chapters as needed.
+ * 
+ * If the new start value falls between any chapter's start and end:
+ * - Sets that chapter's end to the new start time minus 1
+ * - Inserts a new chapter with the new start time and the previous chapter's original end time
+ * 
+ * @param chapters - The array of existing chapters
+ * @param newStart - The start time of the new chapter in milliseconds
+ * @param title - Optional title for the new chapter (defaults to "New Chapter")
+ * @returns Updated array of chapters with the new chapter inserted
+ */
+export const insertChapter = (chapters: Chapter[], newStart: number, title: string = "New Chapter"): Chapter[] => {
+  // Create a deep copy of the chapters array to avoid mutating the original
+  const updatedChapters = JSON.parse(JSON.stringify(chapters)) as Chapter[];
+  
+  // Default values
+  const defaultTimebase = "1/1000";
+  let newEnd = -1;
+  let insertIndex = updatedChapters.length; // Default to appending at the end
+  
+  // Find if the new start falls between any existing chapter
+  for (let i = 0; i < updatedChapters.length; i++) {
+    const chapter = updatedChapters[i];
+    
+    if (newStart >= chapter.start && newStart <= chapter.end) {
+      // New start falls within this chapter
+      newEnd = chapter.end;
+      // Update this chapter's end to be just before the new chapter starts
+      chapter.end = newStart - 1;
+      // Insert after this chapter
+      insertIndex = i + 1;
+      break;
+    } else if (newStart < chapter.start) {
+      // New start is before this chapter, so insert before it
+      insertIndex = i;
+      // If there's a previous chapter, set the new end to the previous chapter's start - 1
+      if (i > 0) {
+        newEnd = updatedChapters[i - 1].end;
+      } else {
+        // If there's no previous chapter, set the end to the start of the current chapter - 1
+        newEnd = chapter.start - 1;
+      }
+      break;
+    }
+  }
+  
+  // If newEnd is still -1, it means we're adding at the end
+  // In that case, set a reasonable end time (e.g., +10 seconds from start)
+  if (newEnd === -1 && updatedChapters.length > 0) {
+    newEnd = updatedChapters[updatedChapters.length - 1].end;
+  } else if (newEnd === -1) {
+    // If there are no chapters at all, set an arbitrary end time
+    newEnd = newStart + 10000; // 10 seconds later
+  }
+  
+  // Create the new chapter
+  const newChapter: Chapter = {
+    timebase: defaultTimebase,
+    start: newStart,
+    end: newEnd,
+    title: title
+  };
+  
+  // Insert the new chapter at the calculated position
+  updatedChapters.splice(insertIndex, 0, newChapter);
+  
+  return updatedChapters;
+};
