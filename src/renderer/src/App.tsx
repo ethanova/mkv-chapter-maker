@@ -1,7 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
-import { Chapter, parseChapters } from "./utils";
+import { Chapter, parseChapters, formatMillisecondsToTime } from "./utils";
 import ChapterCard from "./components/ChapterCard";
 
 function App() {
@@ -12,6 +12,8 @@ function App() {
   const [loadingChapters, setLoadingChapters] = useState(false);
   // Reference to the video player
   const playerRef = useRef<PlayerReference | null>(null);
+  // State to track current playback time in milliseconds
+  const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
 
   const handleVideoSelectContainerClick = async () => {
     try {
@@ -59,6 +61,7 @@ function App() {
 
   const closeVideo = () => {
     setSelectedVideo(null);
+    setCurrentTimeMs(0);
   };
 
   // Function to adjust the current play time
@@ -85,6 +88,33 @@ function App() {
     newChapters.splice(index, 1);
     setChapters(newChapters);
   };
+
+  // Subscribe to player state changes to update the current time
+  useEffect(() => {
+    // Check if player reference exists
+    if (!playerRef.current) return;
+
+    // Create a listener for player state changes
+    const handleStateChange = () => {
+      if (playerRef.current?.getState) {
+        const state = playerRef.current.getState();
+        // Convert seconds to milliseconds for the formatter
+        const timeInMs = state.player.currentTime * 1000;
+        setCurrentTimeMs(timeInMs);
+      }
+    };
+
+    // Subscribe to state changes when the player is available
+    const player = playerRef.current;
+    player.subscribeToStateChange(handleStateChange);
+
+    // Clean up subscription when component unmounts or player changes
+    return () => {
+      // The video-react Player doesn't provide an unsubscribe method,
+      // but the subscription is automatically cleaned up when the component unmounts
+      // or when the effect runs again with a different dependency
+    };
+  }, [selectedVideo]); // Re-subscribe when the video source changes
 
   return (
     <div className="flex flex-col">
@@ -222,16 +252,9 @@ function App() {
                 </button>
               </div>
               <div className="mt-4 flex justify-center space-x-2">
-                <button
-                  onClick={() =>
-                    console.log(
-                      playerRef.current?.getState().player.currentTime
-                    )
-                  }
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  Current Time
-                </button>
+                <span className="text-lg font-mono">
+                  {formatMillisecondsToTime(currentTimeMs)}
+                </span>
               </div>
             </>
           )}
