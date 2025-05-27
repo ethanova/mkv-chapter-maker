@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
-import { ControlBar, Player } from "video-react"; // Player component
+import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
 import { Chapter, parseChapters } from "./utils";
 // import AppBar from "./AppBar";
 
@@ -10,6 +10,8 @@ function App() {
   // Example chapter data, replace with actual logic later
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loadingChapters, setLoadingChapters] = useState(false);
+  // Reference to the video player
+  const playerRef = useRef<PlayerReference | null>(null);
 
   const handleVideoSelectContainerClick = async () => {
     try {
@@ -57,6 +59,22 @@ function App() {
 
   const closeVideo = () => {
     setSelectedVideo(null);
+  };
+
+  // Function to adjust the current play time
+  const adjustPlayTime = (secondsToAdjust: number) => {
+    if (playerRef.current && playerRef.current.getState) {
+      const player = playerRef.current;
+      const state = player.getState();
+      const currentTime = state.player.currentTime;
+      const duration = state.player.duration;
+      
+      // Calculate new time, ensuring it stays within valid range (0 to duration)
+      const newTime = Math.max(0, Math.min(duration, currentTime + secondsToAdjust));
+      
+      // Set the new current time
+      player.seek(newTime);
+    }
   };
 
   return (
@@ -126,10 +144,20 @@ function App() {
                 Close Video
               </button>
               <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
-                <Player src={selectedVideo} autoPlay={false}>
+                <Player ref={(player: PlayerReference) => { playerRef.current = player; }} src={selectedVideo} autoPlay={false}>
                   {/* The Player component handles the source internally if src is provided */}
                   <ControlBar autoHide={false} className="my-class" />
                 </Player>
+              </div>
+              <div className="mt-4 flex justify-center space-x-2">
+                <button onClick={() => adjustPlayTime(-5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-5s</button>
+                <button onClick={() => adjustPlayTime(-1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-1s</button>
+                <button onClick={() => adjustPlayTime(-0.5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-500ms</button>
+                <button onClick={() => adjustPlayTime(-0.1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-100ms</button>
+                <button onClick={() => adjustPlayTime(0.1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+100ms</button>
+                <button onClick={() => adjustPlayTime(0.5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+500ms</button>
+                <button onClick={() => adjustPlayTime(1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+1s</button>
+                <button onClick={() => adjustPlayTime(5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+5s</button>
               </div>
             </>
           )}
