@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { Player } from "video-react"; // Player component
 // import AppBar from "./AppBar";

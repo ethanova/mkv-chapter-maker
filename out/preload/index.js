@@ -1,27 +1,15 @@
 "use strict";
 const electron = require("electron");
+const preload = require("@electron-toolkit/preload");
 const api = {};
 if (process.contextIsolated) {
   try {
-    electron.contextBridge.exposeInMainWorld("electron", {
-      send: (channel, data) => electron.ipcRenderer.send(channel, data),
-      on: (channel, func) => {
-        electron.ipcRenderer.on(channel, (event, ...args) => func(...args));
-      },
-      invoke: (channel, ...args) => electron.ipcRenderer.invoke(channel, ...args)
-      // Add any other specific APIs from electronAPI if they were being used
-    });
+    electron.contextBridge.exposeInMainWorld("electron", preload.electronAPI);
     electron.contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);
   }
 } else {
-  window.electron = {
-    send: (channel, data) => electron.ipcRenderer.send(channel, data),
-    on: (channel, func) => {
-      electron.ipcRenderer.on(channel, (event, ...args) => func(...args));
-    },
-    invoke: (channel, ...args) => electron.ipcRenderer.invoke(channel, ...args)
-  };
+  window.electron = preload.electronAPI;
   window.api = api;
 }

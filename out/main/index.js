@@ -1,6 +1,7 @@
 "use strict";
 const electron = require("electron");
 const path = require("path");
+const utils = require("@electron-toolkit/utils");
 const icon = path.join(__dirname, "../../resources/icon.png");
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
@@ -17,36 +18,21 @@ function createWindow() {
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
   });
-  if (!electron.app.isPackaged) {
-    mainWindow.webContents.on("context-menu", (_event, params) => {
-      mainWindow.webContents.inspectElement(params.x, params.y);
-    });
-  }
   mainWindow.webContents.setWindowOpenHandler((details) => {
     electron.shell.openExternal(details.url);
     return { action: "deny" };
   });
-  if (!electron.app.isPackaged && process.env["ELECTRON_RENDERER_URL"]) {
+  if (utils.is.dev && process.env["ELECTRON_RENDERER_URL"]) {
     mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
     mainWindow.loadFile(path.join(__dirname, "../renderer/index.html"));
   }
 }
 electron.app.whenReady().then(() => {
-  electron.app.setAppUserModelId("com.electron");
+  utils.electronApp.setAppUserModelId("com.electron");
   electron.app.on("browser-window-created", (_, window) => {
-    if (!electron.app.isPackaged) {
-      window.webContents.on("before-input-event", (event, input) => {
-        if (input.key.toUpperCase() === "F12" && !input.alt && !input.control && !input.meta && !input.shift) {
-          if (window.webContents.isDevToolsOpened()) {
-            window.webContents.closeDevTools();
-          } else {
-            window.webContents.openDevTools({ mode: "undocked" });
-          }
-          event.preventDefault();
-        }
-      });
-    }
+    utils.optimizer.watchWindowShortcuts(window);
+    window.webContents.openDevTools();
   });
   electron.ipcMain.on("ping", () => console.log("pong"));
   createWindow();
