@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
 import { Chapter, formatMillisecondsToTime, parseChapters } from "./utils";
-// import AppBar from "./AppBar";
+import { TrashIcon } from "@heroicons/react/24/solid";
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -121,7 +121,7 @@ function App() {
                       <button
                         onClick={() => removeChapter(chapters.indexOf(chapter))}
                       >
-                        Remove
+                        <TrashIcon className="size-6" />
                       </button>
                     </div>
                   </li>
