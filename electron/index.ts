@@ -2,7 +2,7 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme, session } from 'electron';
 import isDev from 'electron-is-dev';
 
 const height = 600;
@@ -29,11 +29,20 @@ function createWindow() {
   // and load the index.html of the app.
   if (isDev) {
     window?.loadURL(url);
+    // Add this to modify CSP for development
+    session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          'Content-Security-Policy': ["script-src 'self' 'unsafe-eval' 'unsafe-inline' localhost:* http://localhost:*"]
+        }
+      });
+    });
   } else {
     window?.loadFile(url);
   }
   // Open the DevTools.
-  // window.webContents.openDevTools();
+  window.webContents.openDevTools();
 
   // For AppBar
   ipcMain.on('minimize', () => {
