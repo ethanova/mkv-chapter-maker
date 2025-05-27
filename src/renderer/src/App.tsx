@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
-import { Player } from "video-react"; // Player component
+import { ControlBar, Player } from "video-react"; // Player component
 import { Chapter, parseChapters } from "./utils";
 // import AppBar from "./AppBar";
 
@@ -128,6 +128,7 @@ function App() {
               <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
                 <Player src={selectedVideo} autoPlay={false}>
                   {/* The Player component handles the source internally if src is provided */}
+                  <ControlBar autoHide={false} className="my-class" />
                 </Player>
               </div>
             </>
