@@ -1,37 +1,34 @@
-# Vite + React + Typescript + Electron - Starter
+# mkv-chapter-maker
 
-https://github.com/AleBL/vite-reactts-electron-starter/assets/26389226/2697ab5c-b6c5-4c28-ab40-1a237e12cf8d
+An Electron application with React and TypeScript
 
-> It is a simple starter template without unnecessary packages.
+## Recommended IDE Setup
 
-This very simple Starter template, utilizes [Vite](https://github.com/vitejs/vite), [Tailwind](https://tailwindcss.com/), [React](https://reactjs.org/), [Typescript](https://www.typescriptlang.org/) and [Electron](https://electronjs.org/).
+- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
 
-By default, the React framework is used for the interface, but you can easily use any other framework such as Vue, Preact, Angular, Svelte or anything else.
+## Project Setup
 
-> Vite is framework agnostic
+### Install
 
-## Installation
+```bash
+$ npm install
+```
 
-Clone this repo and install all dependencies  
-`yarn` or `npm install`
+### Development
 
-## Development
+```bash
+$ npm run dev
+```
 
-`yarn dev` or `npm run dev`
+### Build
 
-## Build
+```bash
+# For windows
+$ npm run build:win
 
-`yarn build` or `npm run build`
+# For macOS
+$ npm run build:mac
 
-## Publish
-
-`yarn dist` or `npm run dist`
-
-## More advanced templates  
-
-If you are looking for more advanced templates than this, please go to one of the following links (these are some other links out of the **[awesome-vite](https://github.com/vitejs/awesome-vite)** repo) or you can help me make this template better 🙂  
-
-Links: 
-- [vite-react-electron](https://github.com/caoxiemeihao/vite-react-electron)
-- [electron-vite-react](https://github.com/twstyled/electron-vite-react)
-- [vite-electron-esbuild-starter](https://github.com/jctaoo/vite-electron-esbuild-starter)
+# For Linux
+$ npm run build:linux
+```
