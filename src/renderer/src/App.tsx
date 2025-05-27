@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
-import { Chapter, parseChapters } from "./utils";
+import { Chapter, formatMillisecondsToTime, parseChapters } from "./utils";
 // import AppBar from "./AppBar";
 
 function App() {
@@ -68,10 +68,13 @@ function App() {
       const state = player.getState();
       const currentTime = state.player.currentTime;
       const duration = state.player.duration;
-      
+
       // Calculate new time, ensuring it stays within valid range (0 to duration)
-      const newTime = Math.max(0, Math.min(duration, currentTime + secondsToAdjust));
-      
+      const newTime = Math.max(
+        0,
+        Math.min(duration, currentTime + secondsToAdjust)
+      );
+
       // Set the new current time
       player.seek(newTime);
     }
@@ -97,7 +100,8 @@ function App() {
                     key={chapter.title}
                     className="p-2 bg-white rounded-md shadow-xs cursor-pointer hover:bg-slate-50 transition-colors"
                   >
-                    {chapter.title}
+                    {chapter.title} /{formatMillisecondsToTime(chapter.start)} /
+                    {formatMillisecondsToTime(chapter.end)}
                   </li>
                 ))}
               </ul>
@@ -144,20 +148,78 @@ function App() {
                 Close Video
               </button>
               <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
-                <Player ref={(player: PlayerReference) => { playerRef.current = player; }} src={selectedVideo} autoPlay={false}>
+                <Player
+                  ref={(player: PlayerReference) => {
+                    playerRef.current = player;
+                  }}
+                  src={selectedVideo}
+                  autoPlay={false}
+                >
                   {/* The Player component handles the source internally if src is provided */}
                   <ControlBar autoHide={false} className="my-class" />
                 </Player>
               </div>
               <div className="mt-4 flex justify-center space-x-2">
-                <button onClick={() => adjustPlayTime(-5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-5s</button>
-                <button onClick={() => adjustPlayTime(-1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-1s</button>
-                <button onClick={() => adjustPlayTime(-0.5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-500ms</button>
-                <button onClick={() => adjustPlayTime(-0.1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">-100ms</button>
-                <button onClick={() => adjustPlayTime(0.1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+100ms</button>
-                <button onClick={() => adjustPlayTime(0.5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+500ms</button>
-                <button onClick={() => adjustPlayTime(1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+1s</button>
-                <button onClick={() => adjustPlayTime(5)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">+5s</button>
+                <button
+                  onClick={() => adjustPlayTime(-5)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  -5s
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(-1)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  -1s
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(-0.5)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  -500ms
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(-0.1)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  -100ms
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(0.1)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  +100ms
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(0.5)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  +500ms
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(1)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  +1s
+                </button>
+                <button
+                  onClick={() => adjustPlayTime(5)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  +5s
+                </button>
+              </div>
+              <div className="mt-4 flex justify-center space-x-2">
+                <button
+                  onClick={() =>
+                    console.log(
+                      playerRef.current?.getState().player.currentTime
+                    )
+                  }
+                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  Current Time
+                </button>
               </div>
             </>
           )}
