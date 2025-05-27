@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
 import {
-  Chapter,
   parseChapters,
   formatMillisecondsToTime,
   insertChapter,
 } from "./utils";
 import ChapterCard from "./components/ChapterCard";
+import { Chapter } from "../../types";
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -20,6 +20,11 @@ function App() {
   // State to track current playback time in milliseconds
   const [currentTimeMs, setCurrentTimeMs] = useState<number>(0);
   const [newChapterTitle, setNewChapterTitle] = useState<string>("");
+  // State for tracking save status
+  const [savingStatus, setSavingStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleVideoSelectContainerClick = async () => {
     try {
@@ -72,7 +77,7 @@ function App() {
 
   // Function to adjust the current play time
   const adjustPlayTime = (secondsToAdjust: number) => {
-    if (playerRef.current && playerRef.current.getState) {
+    if (playerRef.current) {
       const player = playerRef.current;
       const state = player.getState();
       const currentTime = state.player.currentTime;
@@ -99,6 +104,32 @@ function App() {
     const newChapters = [...chapters];
     newChapters.splice(index, 1);
     setChapters(newChapters);
+  };
+
+  const saveChapters = async () => {
+    if (!selectedFilePath || chapters.length === 0) return;
+
+    try {
+      setSavingStatus("saving");
+      setSaveError(null);
+
+      // Call the electron IPC method to save chapters
+      const result = await window.api.saveChapters(selectedFilePath, chapters);
+
+      console.log("Save result:", result);
+      setSavingStatus("success");
+
+      // Reset status after a delay
+      setTimeout(() => {
+        setSavingStatus("idle");
+      }, 3000);
+    } catch (error) {
+      console.error("Error saving chapters:", error);
+      setSavingStatus("error");
+      setSaveError(
+        typeof error === "string" ? error : "Failed to save chapters"
+      );
+    }
   };
 
   // Subscribe to player state changes to update the current time
@@ -133,17 +164,49 @@ function App() {
       <div className="flex h-screen font-sans bg-gray-50">
         {/* Left Column: Chapters */}
         <div className="w-1/5 bg-slate-100 p-4 flex flex-col border-r border-slate-300 shadow-sm">
-          <h2 className="text-xl font-semibold mb-4 text-slate-700 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 mr-2 text-blue-500"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
-            </svg>
-            Chapters
-          </h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-slate-700 flex items-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5 mr-2 text-blue-500"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z" />
+              </svg>
+              Chapters
+            </h2>
+            {selectedFilePath && chapters.length > 0 && (
+              <button
+                onClick={saveChapters}
+                disabled={savingStatus === "saving"}
+                className={`px-3 py-1 text-sm rounded-md text-white ${
+                  savingStatus === "saving"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : savingStatus === "success"
+                      ? "bg-green-500 hover:bg-green-600"
+                      : savingStatus === "error"
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-blue-500 hover:bg-blue-600"
+                } transition-colors flex items-center space-x-1`}
+              >
+                {savingStatus === "saving" ? (
+                  <span>Saving...</span>
+                ) : savingStatus === "success" ? (
+                  <span>Saved!</span>
+                ) : savingStatus === "error" ? (
+                  <span>Failed</span>
+                ) : (
+                  <span>Save</span>
+                )}
+              </button>
+            )}
+          </div>
+          {saveError && (
+            <div className="mb-4 p-2 bg-red-100 border border-red-200 rounded text-red-700 text-sm">
+              {saveError}
+            </div>
+          )}
           <div className="overflow-y-auto flex-grow">
             {chapters.length === 0 && selectedVideo ? (
               <p className="text-slate-500 italic">

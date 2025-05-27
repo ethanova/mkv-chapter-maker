@@ -1,6 +1,7 @@
 import * as React from "react";
-import { Chapter, formatMillisecondsToTime } from "../utils";
+import { formatMillisecondsToTime } from "../utils";
 import { TrashIcon } from "@heroicons/react/24/solid";
+import { Chapter } from "../../../types";
 
 interface ChapterCardProps {
   chapter: Chapter;

@@ -1,10 +1,14 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { electronAPI } from "@electron-toolkit/preload";
+import { Chapter } from "../types";
 
 // Custom APIs for renderer
 const api = {
-  getFileMetadata: (filePath: string) => ipcRenderer.invoke('get-file-metadata', filePath),
-  openFileDialog: () => ipcRenderer.invoke('open-file-dialog')
+  getFileMetadata: (filePath: string) =>
+    ipcRenderer.invoke("get-file-metadata", filePath),
+  openFileDialog: () => ipcRenderer.invoke("open-file-dialog"),
+  saveChapters: (filePath: string, chapters: Chapter[]) =>
+    ipcRenderer.invoke("save-chapters", filePath, chapters),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
