@@ -80,6 +80,12 @@ function App() {
     }
   };
 
+  const removeChapter = (index: number) => {
+    const newChapters = [...chapters];
+    newChapters.splice(index, 1);
+    setChapters(newChapters);
+  };
+
   return (
     <div className="flex flex-col">
       <div className="flex h-screen font-sans bg-gray-50">
@@ -89,7 +95,11 @@ function App() {
             Chapters
           </h2>
           <div className="overflow-y-auto flex-grow">
-            {chapters.length === 0 ? (
+            {chapters.length === 0 && selectedVideo ? (
+              <p className="text-slate-500 italic">
+                No chapters found in the selected video.
+              </p>
+            ) : !selectedVideo ? (
               <p className="text-slate-500 italic">
                 Select a video to see chapters.
               </p>
@@ -99,9 +109,21 @@ function App() {
                   <li
                     key={chapter.title}
                     className="p-2 bg-white rounded-md shadow-xs cursor-pointer hover:bg-slate-50 transition-colors"
+                    onClick={() => {
+                      playerRef.current?.seek(chapter.start / 1000);
+                    }}
                   >
-                    {chapter.title} /{formatMillisecondsToTime(chapter.start)} /
-                    {formatMillisecondsToTime(chapter.end)}
+                    <div>
+                      {chapter.title} /{formatMillisecondsToTime(chapter.start)}{" "}
+                      /{formatMillisecondsToTime(chapter.end)}
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => removeChapter(chapters.indexOf(chapter))}
+                      >
+                        Remove
+                      </button>
+                    </div>
                   </li>
                 ))}
               </ul>
