@@ -1,9 +1,13 @@
 // Native
-import { join } from 'path';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, nativeTheme, session } from 'electron';
 import isDev from 'electron-is-dev';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const height = 600;
 const width = 800;
