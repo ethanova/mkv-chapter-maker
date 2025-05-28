@@ -88,7 +88,9 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
-    window.webContents.openDevTools();
+    if (is.dev) {
+      window.webContents.openDevTools();
+    }
   });
 
   // IPC test
@@ -335,9 +337,31 @@ app.whenReady().then(() => {
           ]);
 
           let stderr = "";
+          let lastProgressTime = Date.now();
 
           ffmpeg.stderr.on("data", (data) => {
-            stderr += data.toString();
+            const dataStr = data.toString();
+            stderr += dataStr;
+
+            // Parse progress information
+            // Only send updates at most every 1s to avoid overwhelming the renderer
+            if (Date.now() - lastProgressTime > 1000) {
+              const timeMatch = dataStr.match(/time=([0-9:.]+)/i);
+              if (timeMatch && timeMatch[1]) {
+                const progress = {
+                  time: timeMatch[1],
+                  raw: dataStr.trim(),
+                };
+
+                // Get the BrowserWindow that sent the request
+                const win = BrowserWindow.getAllWindows()[0];
+                if (win) {
+                  win.webContents.send("ffmpeg-progress", progress);
+                }
+
+                lastProgressTime = Date.now();
+              }
+            }
           });
 
           ffmpeg.on("close", async (code) => {

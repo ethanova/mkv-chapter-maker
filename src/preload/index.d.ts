@@ -13,6 +13,9 @@ interface API {
     error?: string;
   }>;
   openFFmpegDownloadPage: () => Promise<void>;
+  onFFmpegProgress: (
+    callback: (progress: { time: string; raw: string }) => void
+  ) => () => void;
 }
 
 declare global {

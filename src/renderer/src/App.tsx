@@ -173,6 +173,22 @@ function App() {
     }
   };
 
+  // Set up the progress listener when the component mounts
+  useEffect(() => {
+    // Skip if not saving
+    if (savingStatus !== "saving") return;
+
+    // Set up the progress listener
+    const removeListener = window.api.onFFmpegProgress((progressData) => {
+      console.log("FFmpeg progress:", progressData.raw);
+    });
+
+    // Clean up the listener when the component unmounts or when saving is done
+    return () => {
+      removeListener();
+    };
+  }, [savingStatus]);
+
   // Subscribe to player state changes to update the current time
   useEffect(() => {
     // Check if player reference exists

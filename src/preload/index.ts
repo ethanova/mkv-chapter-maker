@@ -11,6 +11,20 @@ const api = {
     ipcRenderer.invoke("save-chapters", filePath, chapters),
   checkForFFmpeg: () => ipcRenderer.invoke("check-for-ffmpeg"),
   openFFmpegDownloadPage: () => ipcRenderer.invoke("open-ffmpeg-download-page"),
+  // Add listener for ffmpeg progress events
+  onFFmpegProgress: (callback: (progress: { time: string; raw: string }) => void) => {
+    const subscription = (_event: Electron.IpcRendererEvent, progress: { time: string; raw: string }) => {
+      callback(progress);
+    };
+    
+    // Add the event listener
+    ipcRenderer.on('ffmpeg-progress', subscription);
+    
+    // Return a function to remove the listener when no longer needed
+    return () => {
+      ipcRenderer.removeListener('ffmpeg-progress', subscription);
+    };
+  },
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
