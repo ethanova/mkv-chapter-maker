@@ -25,6 +25,18 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Install snapcraft (if needed)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo snap install snapcraft --classic
+
+      - name: Clean Electron Builder cache
+        if: matrix.os == 'ubuntu-latest'
+        run: rm -rf ~/.cache/electron-builder
+
+      - name: Ensure app-builder executable permissions
+        if: matrix.os == 'ubuntu-latest'
+        run: chmod +x node_modules/app-builder-bin/linux/x64/app-builder || true
+
       - name: build-linux
         if: matrix.os == 'ubuntu-latest'
         run: npm run build:linux
