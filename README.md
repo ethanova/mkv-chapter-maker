@@ -4,6 +4,9 @@ An Electron application with React and TypeScript.
 
 A tool to create chapters for MKV/video files.
 
+![image](https://github.com/user-attachments/assets/77c25616-170b-4afa-8c33-b982ec63e189)
+
+
 ## Recommended IDE Setup
 
 - [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
