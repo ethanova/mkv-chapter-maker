@@ -95,7 +95,17 @@ function App() {
   };
 
   const addChapter = () => {
-    const newChapters = insertChapter(chapters, currentTimeMs, newChapterTitle);
+    const totalVideoLength = playerRef.current?.getState().player.duration;
+    if (!totalVideoLength) {
+      console.error("Total video length is not available");
+      return;
+    }
+    const newChapters = insertChapter(
+      chapters,
+      currentTimeMs,
+      newChapterTitle,
+      (totalVideoLength - 1) * 1000 // Convert to milliseconds
+    );
     setChapters(newChapters);
     setNewChapterTitle("");
   };
@@ -354,6 +364,11 @@ function App() {
                       placeholder="Enter a descriptive title"
                       value={newChapterTitle}
                       onChange={(e) => setNewChapterTitle(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && newChapterTitle) {
+                          addChapter();
+                        }
+                      }}
                       className="flex-1 px-4 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                     <button

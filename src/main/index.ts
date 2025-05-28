@@ -176,12 +176,12 @@ app.whenReady().then(() => {
             skipChapter = true;
             continue;
           }
-          
+
           // If we're in skip mode and encounter a new section marker (starts with [) or empty line, stop skipping
           if (skipChapter && (line.startsWith("[") || line.trim() === "")) {
             skipChapter = false;
           }
-          
+
           // Only add non-skipped lines to our filtered output
           if (!skipChapter) {
             filteredLines.push(line);
@@ -191,6 +191,8 @@ app.whenReady().then(() => {
         // Create new metadata with updated chapters
         let updatedMetadata = filteredLines.join("\n");
 
+        console.log("Updated (cleared) metadata:", updatedMetadata);
+
         // Ensure we have a trailing newline
         if (!updatedMetadata.endsWith("\n")) {
           updatedMetadata += "\n";
@@ -199,17 +201,19 @@ app.whenReady().then(() => {
         // Add chapters in ffmpeg metadata format
         for (let i = 0; i < sortedChapters.length; i++) {
           const chapter = sortedChapters[i];
-          const nextChapterStart =
-            i < sortedChapters.length - 1
-              ? sortedChapters[i + 1].start
-              : chapter.start + 10000; // If last chapter, add 10 seconds as end
+          // const nextChapterStart =
+          //   i < sortedChapters.length - 1
+          //     ? sortedChapters[i + 1].start
+          //     : chapter.start + 10000; // If last chapter, add 10 seconds as end
 
           updatedMetadata += "\n[CHAPTER]\n";
           updatedMetadata += "TIMEBASE=1/1000\n";
           updatedMetadata += `START=${chapter.start}\n`;
-          updatedMetadata += `END=${nextChapterStart}\n`;
+          updatedMetadata += `END=${chapter.end}\n`;
           updatedMetadata += `title=${chapter.title}\n`;
         }
+
+        console.log("Updated (with chapters) metadata:", updatedMetadata);
 
         // Write metadata to temporary file
         const tempMetadataPath = `${filePath}.metadata.txt`;
@@ -223,6 +227,9 @@ app.whenReady().then(() => {
         const fileExt = filePath.split(".").pop() || "mkv";
         const outputPath = `${filePath}.new.${fileExt}`;
 
+        console.log("Temporary metadata path:", tempMetadataPath);
+        console.log("Output path:", outputPath);
+
         // Apply the metadata to create a new file
         return new Promise((resolve, reject) => {
           const ffmpeg = spawn("ffmpeg", [
@@ -231,6 +238,8 @@ app.whenReady().then(() => {
             "-i",
             tempMetadataPath,
             "-map_metadata",
+            "1",
+            "-map_chapters",
             "1",
             "-codec",
             "copy",
@@ -246,12 +255,14 @@ app.whenReady().then(() => {
 
           ffmpeg.on("close", async (code) => {
             try {
+              console.log("FFmpeg process closed with code:", code);
               // Remove temporary metadata file
-              await promisify(fs.unlink)(tempMetadataPath);
+              // await promisify(fs.unlink)(tempMetadataPath);
 
               if (code === 0) {
                 // Rename the new file to the original filename
                 await promisify(fs.rename)(outputPath, filePath);
+                console.log("Chapters saved successfully");
                 resolve("Chapters saved successfully");
               } else {
                 // Clean up failed output if it exists
@@ -261,14 +272,17 @@ app.whenReady().then(() => {
                 } catch (e) {
                   // File doesn't exist, ignore
                 }
+                console.error("FFmpeg process closed with code:", code);
                 reject(`ffmpeg exited with code ${code}: ${stderr}`);
               }
             } catch (err) {
+              console.error("Error during file operations:", err);
               reject(`Error during file operations: ${err}`);
             }
           });
 
           ffmpeg.on("error", (err) => {
+            console.error("Failed to spawn ffmpeg:", err);
             reject(`Failed to spawn ffmpeg: ${err.message}`);
           });
         });
