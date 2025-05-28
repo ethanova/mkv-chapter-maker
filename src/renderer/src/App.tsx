@@ -130,7 +130,20 @@ function App() {
 
   const removeChapter = (index: number) => {
     const newChapters = [...chapters];
-    newChapters.splice(index, 1);
+
+    // Check if we're removing the last chapter and there will be chapters remaining
+    if (index === chapters.length - 1 && chapters.length > 1) {
+      // Store the end time of the last chapter being removed
+      const lastChapterEndTime = chapters[index].end;
+      // Remove the chapter
+      newChapters.splice(index, 1);
+      // Update the new last chapter's end time to match the removed chapter's end time
+      newChapters[newChapters.length - 1].end = lastChapterEndTime;
+    } else {
+      // Standard removal without end time adjustment
+      newChapters.splice(index, 1);
+    }
+
     setChapters(newChapters);
   };
 
