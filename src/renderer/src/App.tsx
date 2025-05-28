@@ -210,7 +210,7 @@ function App() {
       <div className="flex h-screen font-sans bg-gray-50">
         {/* Left Column: Chapters */}
         <div className="w-1/5 bg-slate-100 flex flex-col border-r border-slate-300 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-between items-center mb-4 p-4">
             <h2 className="text-xl font-semibold text-slate-700 flex items-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
