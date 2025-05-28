@@ -6,6 +6,9 @@ A tool to create chapters for MKV/video files.
 
 ![image](https://github.com/user-attachments/assets/77c25616-170b-4afa-8c33-b982ec63e189)
 
+## Installation
+
+Grab the latest release from the [releases page](https://github.com/ethangarber/mkv-chapter-maker/releases).
 
 ## Recommended IDE Setup
 
