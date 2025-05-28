@@ -344,7 +344,7 @@ app.whenReady().then(() => {
             try {
               console.log("FFmpeg process closed with code:", code);
               // Remove temporary metadata file
-              // await promisify(fs.unlink)(tempMetadataPath);
+              await promisify(fs.unlink)(tempMetadataPath);
 
               if (code === 0) {
                 // Rename the new file to the original filename
