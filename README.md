@@ -1,6 +1,8 @@
 # mkv-chapter-maker
 
-An Electron application with React and TypeScript
+An Electron application with React and TypeScript.
+
+A tool to create chapters for MKV/video files.
 
 ## Recommended IDE Setup
 
@@ -32,3 +34,9 @@ $ npm run build:mac
 # For Linux
 $ npm run build:linux
 ```
+
+## License
+
+This project is licensed under the terms of the [GNU General Public License v3.0 or later](./LICENSE).
+
+See [https://www.gnu.org/licenses/gpl-3.0.html](https://www.gnu.org/licenses/gpl-3.0.html) for more information.
