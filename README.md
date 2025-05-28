@@ -8,7 +8,18 @@ A tool to create chapters for MKV/video files.
 
 ## Installation
 
-Grab the latest release from the [releases page](https://github.com/ethangarber/mkv-chapter-maker/releases).
+### Windows
+You're lucky! I believe that you can just download the exe from the [latest release](https://github.com/ethanova/mkv-chapter-maker/releases) assets and install it using that.
+
+### Mac
+I have not paid Apple their yearly tribute to be able to sign/create/distribute programs like this, so you have to download the source code and build it. Fairly straightforward though!
+
+- Download/git clone this project.
+- Ensure you have [FFMPEG installed](https://ffmpeg.org/download.html) in one of these places (depending on your OS): https://github.com/ethanova/mkv-chapter-maker/blob/main/src/constants.ts#L1
+- Ensure you have node/npm installed.
+- Open a terminal at this project's directory and run `npm install`
+- Then, depending on your OS, run either `npm run build:win`, `npm run build:mac`, or `npm run build:linux`
+- The /dist folder will contain your .exe/.dmg/whatever that you can use to install it
 
 ## Recommended IDE Setup
 
