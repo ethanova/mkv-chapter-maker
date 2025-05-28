@@ -220,7 +220,9 @@ function App() {
             </div>
           )}
           <div className="overflow-y-auto flex-grow">
-            {chapters.length === 0 && selectedVideo ? (
+            {loadingChapters ? (
+              <p className="text-slate-500 italic">Loading chapters...</p>
+            ) : chapters.length === 0 && selectedVideo ? (
               <p className="text-slate-500 italic">
                 No chapters found in the selected video.
               </p>
