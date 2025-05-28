@@ -148,8 +148,13 @@ app.whenReady().then(() => {
     }
   });
 
-  // Handle ffmpeg metadata extraction
-  ipcMain.handle("get-file-metadata", async (_event, filePath: string) => {
+  // Get OS platform handler
+  ipcMain.handle("get-os", () => {
+    return process.platform;
+  });
+
+  // FFmpeg metadata handler
+  ipcMain.handle("get-file-metadata", async (_, filePath: string) => {
     console.log("Getting metadata for:", filePath);
     try {
       const ffprobe = spawn("ffmpeg", [

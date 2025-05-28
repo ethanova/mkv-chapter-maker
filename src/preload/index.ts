@@ -4,6 +4,7 @@ import { Chapter } from "../types";
 
 // Custom APIs for renderer
 const api = {
+  getOS: () => ipcRenderer.invoke("get-os"),
   getFileMetadata: (filePath: string) =>
     ipcRenderer.invoke("get-file-metadata", filePath),
   openFileDialog: () => ipcRenderer.invoke("open-file-dialog"),

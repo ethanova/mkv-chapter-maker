@@ -1,6 +1,7 @@
 import { ElectronAPI } from "@electron-toolkit/preload";
 
 interface API {
+  getOS: () => Promise<string>;
   getFileMetadata: (filePath: string) => Promise<any>;
   openFileDialog: () => Promise<string | null>;
   saveChapters: (
