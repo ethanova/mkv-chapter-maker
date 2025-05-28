@@ -73,6 +73,7 @@ function App() {
   const closeVideo = () => {
     setSelectedVideo(null);
     setCurrentTimeMs(0);
+    playerRef?.current?.load();
   };
 
   // Function to adjust the current play time
@@ -279,8 +280,25 @@ function App() {
             </div>
           ) : (
             <>
-              <button className="text-black" onClick={closeVideo}>
-                Close Video
+              <button
+                onClick={closeVideo}
+                className="mb-4 px-3 py-1 bg-slate-500 text-white rounded hover:bg-slate-600 transition-colors flex items-center space-x-1"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+                <span>Close Video</span>
               </button>
               <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
                 <Player
