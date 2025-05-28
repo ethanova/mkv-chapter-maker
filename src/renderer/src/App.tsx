@@ -75,6 +75,8 @@ function App() {
     setSelectedVideo(null);
     setCurrentTimeMs(0);
     playerRef?.current?.load();
+    setSelectedFilePath(null);
+    setChapters([]);
   };
 
   // Function to adjust the current play time
@@ -191,9 +193,9 @@ function App() {
             {selectedFilePath && chapters.length > 0 && (
               <button
                 onClick={saveChapters}
-                disabled={savingStatus === "saving"}
+                disabled={!selectedVideo || savingStatus === "saving"}
                 className={`px-3 py-1 text-sm rounded-md text-white ${
-                  savingStatus === "saving"
+                  savingStatus === "saving" || !selectedVideo
                     ? "bg-gray-400 cursor-not-allowed"
                     : savingStatus === "success"
                       ? "bg-green-500 hover:bg-green-600"
