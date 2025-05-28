@@ -6,6 +6,42 @@ import { spawn } from "child_process";
 import * as fs from "fs";
 import { promisify } from "util";
 import { Chapter } from "../types";
+import os from "os";
+import path from "path";
+
+const commonFFmpegPaths = [
+  // macOS/Homebrew locations
+  "/opt/homebrew/bin",
+  "/usr/local/bin",
+
+  // Linux common locations
+  "/usr/bin",
+  "/usr/local/bin",
+
+  // Windows locations (assuming ffmpeg.exe is installed globally or in PATH)
+  "C:\\ffmpeg\\bin",
+  "C:\\Program Files\\ffmpeg\\bin",
+  "C:\\Program Files (x86)\\ffmpeg\\bin",
+];
+function prependFFmpegPaths() {
+  const platform = os.platform();
+
+  const extraPaths = commonFFmpegPaths
+    .filter((p) => {
+      if (platform === "win32") {
+        return p.includes("C:\\");
+      } else {
+        return p.startsWith("/");
+      }
+    })
+    .join(path.delimiter); // Windows uses `;`, POSIX uses `:`
+
+  if (extraPaths) {
+    process.env.PATH = extraPaths + path.delimiter + process.env.PATH;
+  }
+}
+
+prependFFmpegPaths();
 
 function createWindow(): void {
   // Create the browser window.
@@ -85,30 +121,30 @@ app.whenReady().then(() => {
     try {
       return new Promise((resolve) => {
         const ffmpeg = spawn("ffmpeg", ["-version"]);
-        
+
         let stdout = "";
         let stderr = "";
-        
+
         ffmpeg.stdout.on("data", (data) => {
           stdout += data.toString();
         });
-        
+
         ffmpeg.stderr.on("data", (data) => {
           stderr += data.toString();
         });
-        
+
         ffmpeg.on("close", (code) => {
           if (code === 0) {
             // FFmpeg is installed and working
             console.log("FFmpeg is installed");
-            resolve({ installed: true, version: stdout.split('\n')[0] });
+            resolve({ installed: true, version: stdout.split("\n")[0] });
           } else {
             // FFmpeg exited with an error
             console.log("FFmpeg check failed with code:", code);
             resolve({ installed: false, error: stderr });
           }
         });
-        
+
         ffmpeg.on("error", (err) => {
           // Could not spawn FFmpeg, likely not installed
           console.error("Failed to spawn FFmpeg:", err);
@@ -117,7 +153,8 @@ app.whenReady().then(() => {
       });
     } catch (error: unknown) {
       console.error("Error checking for FFmpeg:", error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       return { installed: false, error: errorMessage };
     }
   });
