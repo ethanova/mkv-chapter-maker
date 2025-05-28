@@ -11,6 +11,7 @@ import { Chapter } from "../../types";
 import { TimeTravelButtons } from "./components/TimeTravel";
 
 function App() {
+  const [ffmpegInstalled, setFFmpegInstalled] = useState<boolean>(false);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   // Example chapter data, replace with actual logic later
@@ -26,6 +27,19 @@ function App() {
     "idle" | "saving" | "success" | "error"
   >("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  useEffect(() => {
+    window.api
+      .checkForFFmpeg()
+      .then((result) => {
+        console.log("FFmpeg check result:", result);
+        setFFmpegInstalled(result.installed);
+      })
+      .catch((error) => {
+        console.error("Error checking for FFmpeg:", error);
+        setFFmpegInstalled(false);
+      });
+  }, []);
 
   const handleVideoSelectContainerClick = async () => {
     try {
@@ -172,6 +186,23 @@ function App() {
       // or when the effect runs again with a different dependency
     };
   }, [selectedVideo]); // Re-subscribe when the video source changes
+
+  if (!ffmpegInstalled) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center">
+        <h1 className="text-2xl font-bold mb-4">FFmpeg Not Found</h1>
+        <p className="text-gray-600 mb-4">
+          Please install FFmpeg to use this application.
+        </p>
+        <button
+          onClick={() => window.api.openFFmpegDownloadPage()}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          Download FFmpeg
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col">

@@ -72,6 +72,49 @@ app.whenReady().then(() => {
     return filePaths[0];
   });
 
+  // Handle checking if FFmpeg is installed
+  ipcMain.handle("check-for-ffmpeg", async () => {
+    console.log("Checking for FFmpeg installation...");
+    try {
+      return new Promise((resolve) => {
+        const ffmpeg = spawn("ffmpeg", ["-version"]);
+        
+        let stdout = "";
+        let stderr = "";
+        
+        ffmpeg.stdout.on("data", (data) => {
+          stdout += data.toString();
+        });
+        
+        ffmpeg.stderr.on("data", (data) => {
+          stderr += data.toString();
+        });
+        
+        ffmpeg.on("close", (code) => {
+          if (code === 0) {
+            // FFmpeg is installed and working
+            console.log("FFmpeg is installed");
+            resolve({ installed: true, version: stdout.split('\n')[0] });
+          } else {
+            // FFmpeg exited with an error
+            console.log("FFmpeg check failed with code:", code);
+            resolve({ installed: false, error: stderr });
+          }
+        });
+        
+        ffmpeg.on("error", (err) => {
+          // Could not spawn FFmpeg, likely not installed
+          console.error("Failed to spawn FFmpeg:", err);
+          resolve({ installed: false, error: err.message });
+        });
+      });
+    } catch (error: unknown) {
+      console.error("Error checking for FFmpeg:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return { installed: false, error: errorMessage };
+    }
+  });
+
   // Handle ffmpeg metadata extraction
   ipcMain.handle("get-file-metadata", async (_event, filePath: string) => {
     console.log("Getting metadata for:", filePath);

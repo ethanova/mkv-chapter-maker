@@ -9,6 +9,7 @@ const api = {
   openFileDialog: () => ipcRenderer.invoke("open-file-dialog"),
   saveChapters: (filePath: string, chapters: Chapter[]) =>
     ipcRenderer.invoke("save-chapters", filePath, chapters),
+  checkForFFmpeg: () => ipcRenderer.invoke("check-for-ffmpeg"),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
