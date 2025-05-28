@@ -28,6 +28,7 @@ function App() {
     "idle" | "saving" | "success" | "error"
   >("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [hoveredChapter, setHoveredChapter] = useState<Chapter | null>(null);
 
   useEffect(() => {
     window.api
@@ -190,6 +191,52 @@ function App() {
     };
   }, [savingStatus]);
 
+  // Handle the chapter highlight bar positioning based on hoveredChapter
+  useEffect(() => {
+    if (!playerRef.current || !hoveredChapter) return;
+
+    // Get the total video duration from the player state
+    const totalDuration = playerRef.current.getState().player.duration * 1000; // convert to ms
+    if (!totalDuration) return;
+
+    // Calculate the start position and width as percentages
+    const startPercent = (hoveredChapter.start / totalDuration) * 100;
+    const endPercent = (hoveredChapter.end / totalDuration) * 100;
+    const widthPercent = endPercent - startPercent;
+
+    // Find the slider element
+    const sliderElement = document.querySelector(
+      ".mkv-chapter-maker-control-bar .video-react-progress-holder.video-react-slider-horizontal"
+    ) as HTMLElement;
+    if (!sliderElement) return;
+
+    // Check if the highlight bar already exists, create it if not
+    let highlightBar = sliderElement.querySelector(".chapter-highlight-bar");
+    if (!highlightBar) {
+      highlightBar = document.createElement("div");
+      highlightBar.className = "chapter-highlight-bar";
+      sliderElement.appendChild(highlightBar);
+    }
+
+    // Set the CSS variables for positioning and width
+    sliderElement.style.setProperty(
+      "--chapter-start-percent",
+      `${startPercent}%`
+    );
+    sliderElement.style.setProperty(
+      "--chapter-width-percent",
+      `${widthPercent}%`
+    );
+    sliderElement.style.setProperty("--chapter-highlight-opacity", "1");
+
+    // Clean up function to hide the highlight when hoveredChapter becomes null
+    return () => {
+      if (sliderElement) {
+        sliderElement.style.setProperty("--chapter-highlight-opacity", "0");
+      }
+    };
+  }, [hoveredChapter]);
+
   // Subscribe to player state changes to update the current time
   useEffect(() => {
     // Check if player reference exists
@@ -283,7 +330,11 @@ function App() {
             ) : (
               <ul className="space-y-3">
                 {chapters.map((chapter) => (
-                  <li key={chapter.title}>
+                  <li
+                    key={chapter.title}
+                    onMouseOver={() => setHoveredChapter(chapter)}
+                    onMouseLeave={() => setHoveredChapter(null)}
+                  >
                     <ChapterCard
                       chapter={chapter}
                       onClick={() => {
@@ -353,7 +404,7 @@ function App() {
                 </svg>
                 <span>Close Video</span>
               </button>
-              <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black">
+              <div className="w-full max-w-4xl h-auto aspect-video shadow-xl rounded-lg overflow-hidden bg-black relative">
                 <Player
                   ref={(player: PlayerReference) => {
                     playerRef.current = player;
@@ -362,8 +413,12 @@ function App() {
                   autoPlay={false}
                 >
                   {/* The Player component handles the source internally if src is provided */}
-                  <ControlBar autoHide={false} className="my-class" />
+                  <ControlBar
+                    autoHide={false}
+                    className="mkv-chapter-maker-control-bar"
+                  />
                 </Player>
+                {/* Chapter highlight bar will be positioned inside .video-react-slider-horizontal */}
               </div>
               <TimeTravelButtons adjustPlayTime={adjustPlayTime} />
               <div className="mt-4 flex justify-center space-x-2">
