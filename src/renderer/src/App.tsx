@@ -142,8 +142,18 @@ function App() {
       // Update the new last chapter's end time to match the removed chapter's end time
       newChapters[newChapters.length - 1].end = lastChapterEndTime;
     } else {
-      // Standard removal without end time adjustment
-      newChapters.splice(index, 1);
+      // Check if there's a chapter before the one being deleted
+      if (index > 0) {
+        // Store the end time of the chapter being deleted
+        const deletedChapterEndTime = chapters[index].end;
+        // Remove the chapter
+        newChapters.splice(index, 1);
+        // Update the previous chapter's end time to match the removed chapter's end time
+        newChapters[index - 1].end = deletedChapterEndTime;
+      } else {
+        // Standard removal without end time adjustment - implies we're removing the first chapter
+        newChapters.splice(index, 1);
+      }
     }
 
     setChapters(newChapters);

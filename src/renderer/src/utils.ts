@@ -157,7 +157,13 @@ export const insertChapter = (
   let insertIndex = updatedChapters.length; // Default to appending at the end
 
   if (chapters.length === 0) {
+    // If there are no chapters, the new chapter will be the only one
     newEnd = videoLength;
+  } else if (newStart < chapters[0].start) {
+    // If the new start is before the first chapter, it will be the first chapter
+    newEnd = chapters[0].start;
+    // Insert at the beginning
+    insertIndex = 0;
   } else {
     // Find if the new start falls between any existing chapter
     for (let i = 0; i < updatedChapters.length; i++) {
