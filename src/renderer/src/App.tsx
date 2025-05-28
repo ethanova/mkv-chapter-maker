@@ -8,6 +8,7 @@ import {
 } from "./utils";
 import ChapterCard from "./components/ChapterCard";
 import { Chapter } from "../../types";
+import { TimeTravelButtons } from "./components/TimeTravel";
 
 function App() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
@@ -312,56 +313,7 @@ function App() {
                   <ControlBar autoHide={false} className="my-class" />
                 </Player>
               </div>
-              <div className="mt-4 flex justify-center space-x-2">
-                <button
-                  onClick={() => adjustPlayTime(-5)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  -5s
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(-1)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  -1s
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(-0.5)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  -500ms
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(-0.1)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  -100ms
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(0.1)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  +100ms
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(0.5)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  +500ms
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(1)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  +1s
-                </button>
-                <button
-                  onClick={() => adjustPlayTime(5)}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                >
-                  +5s
-                </button>
-              </div>
+              <TimeTravelButtons adjustPlayTime={adjustPlayTime} />
               <div className="mt-4 flex justify-center space-x-2">
                 <span className="text-lg font-mono">
                   Current Time: {formatMillisecondsToTime(currentTimeMs)}
