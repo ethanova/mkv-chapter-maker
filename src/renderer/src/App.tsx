@@ -9,6 +9,7 @@ import {
 import ChapterCard from "./components/ChapterCard";
 import { Chapter } from "../../types";
 import { TimeTravelButtons } from "./components/TimeTravel";
+import { FFmpegNotFound } from "./components/FFmpegNotFound";
 
 function App() {
   const [ffmpegInstalled, setFFmpegInstalled] = useState<boolean>(false);
@@ -217,21 +218,7 @@ function App() {
   }, [selectedVideo]); // Re-subscribe when the video source changes
 
   if (!ffmpegInstalled) {
-    return (
-      <div className="flex flex-col h-screen items-center justify-center">
-        <h1 className="text-2xl font-bold mb-4">FFmpeg Not Found</h1>
-        <p className="text-gray-600 mb-4">
-          Please install FFmpeg or ensure it is on your PATH to use this
-          application.
-        </p>
-        <button
-          onClick={() => window.api.openFFmpegDownloadPage()}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-        >
-          Download FFmpeg
-        </button>
-      </div>
-    );
+    return <FFmpegNotFound />;
   }
 
   return (

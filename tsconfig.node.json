@@ -4,7 +4,8 @@
     "electron.vite.config.*",
     "src/main/**/*",
     "src/preload/**/*",
-    "src/types.ts"
+    "src/types.ts",
+    "src/constants.ts"
   ],
   "compilerOptions": {
     "composite": true,

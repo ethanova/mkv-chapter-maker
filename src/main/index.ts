@@ -8,21 +8,8 @@ import { promisify } from "util";
 import { Chapter } from "../types";
 import os from "os";
 import path from "path";
+import { commonFFmpegPaths } from "../constants";
 
-const commonFFmpegPaths = [
-  // macOS/Homebrew locations
-  "/opt/homebrew/bin",
-  "/usr/local/bin",
-
-  // Linux common locations
-  "/usr/bin",
-  "/usr/local/bin",
-
-  // Windows locations (assuming ffmpeg.exe is installed globally or in PATH)
-  "C:\\ffmpeg\\bin",
-  "C:\\Program Files\\ffmpeg\\bin",
-  "C:\\Program Files (x86)\\ffmpeg\\bin",
-];
 function prependFFmpegPaths() {
   const platform = os.platform();
 
