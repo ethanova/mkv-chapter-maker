@@ -72,6 +72,13 @@ app.whenReady().then(() => {
     return filePaths[0];
   });
 
+  // Handle opening FFmpeg download page
+  ipcMain.handle("open-ffmpeg-download-page", async () => {
+    const url = "https://ffmpeg.org/download.html";
+    await shell.openExternal(url);
+    return true;
+  });
+
   // Handle checking if FFmpeg is installed
   ipcMain.handle("check-for-ffmpeg", async () => {
     console.log("Checking for FFmpeg installation...");

@@ -192,7 +192,8 @@ function App() {
       <div className="flex flex-col h-screen items-center justify-center">
         <h1 className="text-2xl font-bold mb-4">FFmpeg Not Found</h1>
         <p className="text-gray-600 mb-4">
-          Please install FFmpeg to use this application.
+          Please install FFmpeg or ensure it is on your PATH to use this
+          application.
         </p>
         <button
           onClick={() => window.api.openFFmpegDownloadPage()}

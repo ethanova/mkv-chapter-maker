@@ -10,6 +10,7 @@ const api = {
   saveChapters: (filePath: string, chapters: Chapter[]) =>
     ipcRenderer.invoke("save-chapters", filePath, chapters),
   checkForFFmpeg: () => ipcRenderer.invoke("check-for-ffmpeg"),
+  openFFmpegDownloadPage: () => ipcRenderer.invoke("open-ffmpeg-download-page"),
 };
 
 // Use `contextBridge` APIs to expose Electron APIs to
