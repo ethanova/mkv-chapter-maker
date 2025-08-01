@@ -318,6 +318,8 @@ app.whenReady().then(() => {
             filePath,
             "-i",
             tempMetadataPath,
+            "map",
+            "0", // map all streams from first input
             "-map_metadata",
             "1",
             "-map_chapters",
@@ -364,7 +366,7 @@ app.whenReady().then(() => {
 
               if (code === 0) {
                 // Rename the new file to the original filename
-                await promisify(fs.rename)(outputPath, filePath);
+                // await promisify(fs.rename)(outputPath, filePath);
                 console.log("Chapters saved successfully");
                 resolve("Chapters saved successfully");
               } else {
