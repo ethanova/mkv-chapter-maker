@@ -316,9 +316,11 @@ app.whenReady().then(() => {
           const ffmpeg = spawn("ffmpeg", [
             "-i",
             filePath,
+            "-f",
+            "ffmetadata",
             "-i",
             tempMetadataPath,
-            "map",
+            "-map",
             "0", // map all streams from first input
             "-map_metadata",
             "1",
