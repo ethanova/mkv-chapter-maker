@@ -29,6 +29,7 @@ function App() {
   >("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
   const [hoveredChapter, setHoveredChapter] = useState<Chapter | null>(null);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
 
   useEffect(() => {
     window.api
@@ -93,6 +94,7 @@ function App() {
     playerRef?.current?.load();
     setSelectedFilePath(null);
     setChapters([]);
+    setPlaybackSpeed(1);
   };
 
   // Function to adjust the current play time
@@ -431,10 +433,35 @@ function App() {
                 {/* Chapter highlight bar will be positioned inside .video-react-slider-horizontal */}
               </div>
               <TimeTravelButtons adjustPlayTime={adjustPlayTime} />
-              <div className="mt-4 flex justify-center space-x-2">
+              <div className="mt-4 flex justify-center items-center space-x-4">
                 <span className="text-lg font-mono">
                   Current Time: {formatMillisecondsToTime(currentTimeMs)}
                 </span>
+                <div className="flex items-center space-x-2">
+                  <label htmlFor="speedPicker" className="text-sm font-medium text-slate-700">
+                    Speed:
+                  </label>
+                  <select
+                    id="speedPicker"
+                    value={playbackSpeed}
+                    onChange={(e) => {
+                      const speed = parseFloat(e.target.value);
+                      setPlaybackSpeed(speed);
+                      if (playerRef.current?.video?.video) {
+                        const videoElement = playerRef.current.video.video as HTMLVideoElement;
+                        videoElement.playbackRate = speed;
+                      }
+                    }}
+                    className="px-3 py-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                  >
+                    <option value="0.5">0.5x</option>
+                    <option value="0.75">0.75x</option>
+                    <option value="1">1x</option>
+                    <option value="1.25">1.25x</option>
+                    <option value="1.5">1.5x</option>
+                    <option value="2">2x</option>
+                  </select>
+                </div>
               </div>
               <div className="mt-4 flex flex-col items-center space-y-3">
                 <div className="w-full max-w-lg">
