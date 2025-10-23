@@ -87,7 +87,9 @@ app.whenReady().then(() => {
   ipcMain.handle("open-file-dialog", async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
       properties: ["openFile"],
-      filters: [{ name: "Videos", extensions: ["mp4", "webm", "ogg", "mkv"] }],
+      filters: [
+        { name: "Videos", extensions: ["mp4", "webm", "ogg", "mkv", "m4b"] },
+      ],
     });
 
     if (canceled || filePaths.length === 0) {
@@ -301,7 +303,7 @@ app.whenReady().then(() => {
         await promisify(fs.writeFile)(
           tempMetadataPath,
           updatedMetadata,
-          "utf8"
+          "utf8",
         );
 
         // Create temporary output file path
