@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { useState, useRef, useEffect } from "react";
 import "video-react/dist/video-react.css"; // CSS for video-react
 import { ControlBar, Player, PlayerReference } from "video-react"; // Player component
@@ -447,9 +448,8 @@ function App() {
                     onChange={(e) => {
                       const speed = parseFloat(e.target.value);
                       setPlaybackSpeed(speed);
-                      if (playerRef.current?.video?.video) {
-                        const videoElement = playerRef.current.video.video as HTMLVideoElement;
-                        videoElement.playbackRate = speed;
+                      if (playerRef.current) {
+                        playerRef.current.playbackRate = speed;
                       }
                     }}
                     className="px-3 py-1 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
