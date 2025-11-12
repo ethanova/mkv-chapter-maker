@@ -39,6 +39,9 @@ jobs:
           security list-keychains -d user -s build.keychain login.keychain
           # Import cert and allow codesign/productsign to access the key (non-interactive)
           security import cert.p12 -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productsign
+          # temp see whats going on?
+          security find-identity -v -p codesigning
+          codesign -dv --verbose=4 dist/mac-arm64/mkv-chapter-maker.app 2>&1 | grep -E "TeamIdentifier|Authority"
           security set-key-partition-list -S apple-tool:,apple: -s -k temp_password build.keychain
 
           rm cert.p12
