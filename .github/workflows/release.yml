@@ -28,20 +28,32 @@ jobs:
       - name: Import Code-Signing Certificates (macOS)
         if: matrix.os == 'macos-latest'
         env:
-          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}                 # base64-encoded .p12
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
         run: |
-          # Decode and import certificate
           echo "$CSC_LINK" | base64 --decode > cert.p12
-          # Create a dedicated keychain for the build
+          # Create & use a dedicated keychain
           security create-keychain -p temp_password build.keychain
-          security default-keychain -s build.keychain
+          security default-keychain -d user -s build.keychain
           security unlock-keychain -p temp_password build.keychain
-          # Import certificate
-          security import cert.p12 -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign
+          security list-keychains -d user -s build.keychain login.keychain
+          # Import cert and allow codesign/productsign to access the key (non-interactive)
+          security import cert.p12 -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign -T /usr/bin/productsign
           security set-key-partition-list -S apple-tool:,apple: -s -k temp_password build.keychain
-          # Clean up
+
           rm cert.p12
+
+      - name: Validate notary credentials
+        if: matrix.os == 'macos-latest'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          xcrun notarytool history \
+            --apple-id "$APPLE_ID" \
+            --team-id "$APPLE_TEAM_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD"
 
       - name: Install snapcraft (if needed)
         if: matrix.os == 'ubuntu-latest'
@@ -59,7 +71,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: npm run build:linux
 
-      - name: build-mac
+      - name: Build mac
         if: matrix.os == 'macos-latest'
         run: npm run build:mac
         env:
