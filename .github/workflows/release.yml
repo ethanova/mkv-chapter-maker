@@ -25,6 +25,24 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
+      - name: Import Code-Signing Certificates (macOS)
+        if: matrix.os == 'macos-latest'
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+        run: |
+          # Decode and import certificate
+          echo "$CSC_LINK" | base64 --decode > cert.p12
+          # Create a dedicated keychain for the build
+          security create-keychain -p temp_password build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp_password build.keychain
+          # Import certificate
+          security import cert.p12 -k build.keychain -P "$CSC_KEY_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k temp_password build.keychain
+          # Clean up
+          rm cert.p12
+
       - name: Install snapcraft (if needed)
         if: matrix.os == 'ubuntu-latest'
         run: sudo snap install snapcraft --classic
@@ -44,6 +62,12 @@ jobs:
       - name: build-mac
         if: matrix.os == 'macos-latest'
         run: npm run build:mac
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
 
       - name: build-win
         if: matrix.os == 'windows-latest'
